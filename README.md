@@ -10,10 +10,10 @@ In such cases, ensure your kernel is designed to receive the address of the `boo
 
 ## Build
 
-Ensure EDK2 is properly set up. Specify `a9nloaderPkg/a9nloader.dsc` in `edk2/Conf/target.txt` and then execute the build command.
-
 ```bash
-build
+mkdir build
+cmake -B build
+cmake --build build
 ```
 
 ## License
