@@ -8,7 +8,19 @@ set(ARCH "x86_64" CACHE STRING "Target architecture for EDK2 build")
 set(CHAINDIR "${CMAKE_SOURCE_DIR}/chain" CACHE PATH "Chain directory for EDK2")
 set(A9NLOADERPKG_DIR "${CMAKE_SOURCE_DIR}/a9nloaderPkg" CACHE PATH "Directory containing a9nloaderPkg")
 set(TARGET_TXT "${CMAKE_SOURCE_DIR}/target.txt" CACHE FILEPATH "Path to target.txt")
-set(CLANG_BIN "/lib/llvm-19/bin/")
+# set(CLANG_BIN "/lib/llvm-19/bin/")
+
+find_program(LLVM_CONFIG_EXECUTABLE llvm-config)
+if(LLVM_CONFIG_EXECUTABLE)
+    execute_process(
+        COMMAND ${LLVM_CONFIG_EXECUTABLE} --bindir
+        OUTPUT_VARIABLE LLVM_BINDIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    set(CLANG_BIN "${LLVM_BINDIR}/")
+else()
+    message(FATAL_ERROR "llvm-config is not found. Please install it or create an alias as llvm-config if it has a version-specific name.")
+endif()
 
 set(EDK2_DIR "${CHAINDIR}/${ARCH}/edk2")
 set(EDK2_CONF_DIR "${EDK2_DIR}/Conf")
