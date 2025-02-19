@@ -4,11 +4,9 @@ include(ExternalProject)
 
 set(ARCH "x86_64" CACHE STRING "Target architecture for EDK2 build")
 
-# set(LLVMDIR "/usr/local/opt/llvm/bin" CACHE PATH "Directory containing LLVM binaries")
 set(CHAINDIR "${CMAKE_SOURCE_DIR}/chain" CACHE PATH "Chain directory for EDK2")
 set(A9NLOADERPKG_DIR "${CMAKE_SOURCE_DIR}/a9nloaderPkg" CACHE PATH "Directory containing a9nloaderPkg")
 set(TARGET_TXT "${CMAKE_SOURCE_DIR}/target.txt" CACHE FILEPATH "Path to target.txt")
-# set(CLANG_BIN "/lib/llvm-19/bin/")
 
 find_program(LLVM_CONFIG_EXECUTABLE llvm-config)
 if(LLVM_CONFIG_EXECUTABLE)
@@ -27,7 +25,8 @@ set(EDK2_CONF_DIR "${EDK2_DIR}/Conf")
 set(BASETOOLS_DIR "${EDK2_DIR}/BaseTools")
 file(MAKE_DIRECTORY "${CHAINDIR}/${ARCH}")
 
-set(EDK2_BINARY "${EDK2_DIR}/Build/A9NLoader/X64/A9NLoader.efi" CACHE FILEPATH "Path to the built EDK2 binary")
+set(A9NLOADER_EXECUTABLE_DIR "${EDK2_DIR}/build/a9nloaderPkg/X64/RELEASE_CLANGPDB/X64")
+set(A9NLOADER_EXECUTABLE "a9nloader.efi")
 
 ExternalProject_Add(edk2_project
   GIT_REPOSITORY "git@github.com:tianocore/edk2.git"
@@ -39,7 +38,8 @@ ExternalProject_Add(edk2_project
   BUILD_WORKING_DIRECTORY "${EDK2_DIR}"
   CONFIGURE_COMMAND bash -c "set -ex && cd ${EDK2_DIR} && git submodule update --init && source ./edksetup.sh && make -C BaseTools"
   BUILD_COMMAND bash -c "set -ex && cd ${EDK2_DIR} && git submodule update --init && export EDK_TOOLS_PATH=${EDK2_DIR}/BaseTools && export CLANG_BIN=${CLANG_BIN} && source ./edksetup.sh BaseTools && cp -r ${A9NLOADERPKG_DIR} a9nloaderPkg && cp -f ${TARGET_TXT} Conf/target.txt && build -n 4"
-  INSTALL_COMMAND ""
+  BUILD_BYPRODUCTS "${A9NLOADER_EXECUTABLE_DIR}/${A9NLOADER_EXECUTABLE}"
+  INSTALL_COMMAND ${CMAKE_COMMAND} -E copy "${A9NLOADER_EXECUTABLE_DIR}/${A9NLOADER_EXECUTABLE}" "${PROJECT_BINARY_DIR}/"
   LOG_DOWNLOAD ON
   LOG_UPDATE ON
   LOG_CONFIGURE ON
