@@ -37,7 +37,7 @@ ExternalProject_Add(edk2_project
   BUILD_IN_SOURCE 1
   CONFIGURE_WORKING_DIRECTORY "${EDK2_DIR}"
   BUILD_WORKING_DIRECTORY "${EDK2_DIR}"
-  CONFIGURE_COMMAND ""
+  CONFIGURE_COMMAND bash -c "set -ex && cd ${EDK2_DIR} && git submodule update --init && source ./edksetup.sh && make -C BaseTools"
   BUILD_COMMAND bash -c "set -ex && cd ${EDK2_DIR} && git submodule update --init && export EDK_TOOLS_PATH=${EDK2_DIR}/BaseTools && export CLANG_BIN=${CLANG_BIN} && source ./edksetup.sh BaseTools && cp -r ${A9NLOADERPKG_DIR} a9nloaderPkg && cp -f ${TARGET_TXT} Conf/target.txt && build -n 4"
   INSTALL_COMMAND ""
   LOG_DOWNLOAD ON
