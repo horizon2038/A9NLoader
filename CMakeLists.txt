@@ -36,12 +36,14 @@ ExternalProject_Add(edk2_project
   BUILD_IN_SOURCE 1
   CONFIGURE_WORKING_DIRECTORY "${EDK2_DIR}"
   BUILD_WORKING_DIRECTORY "${EDK2_DIR}"
-  CONFIGURE_COMMAND bash -c "set -ex && cd ${EDK2_DIR} && git submodule update --init && source ./edksetup.sh && make -C BaseTools"
-  BUILD_COMMAND bash -c "set -ex && cd ${EDK2_DIR} && git submodule update --init && export EDK_TOOLS_PATH=${EDK2_DIR}/BaseTools && export CLANG_BIN=${CLANG_BIN} && source ./edksetup.sh BaseTools && cp -r ${A9NLOADERPKG_DIR} a9nloaderPkg && cp -f ${TARGET_TXT} Conf/target.txt && build -n 4"
+  CONFIGURE_COMMAND bash -c "set -ex && cd ${EDK2_DIR} && git submodule update --init && source ./edksetup.sh && make -C BaseTools && ${CMAKE_COMMAND} -E create_symlink ${A9NLOADERPKG_DIR} a9nloaderPkg && ${CMAKE_COMMAND} -E create_symlink ${TARGET_TXT} Conf/target.txt"
+  BUILD_COMMAND bash -c "set -ex && cd ${EDK2_DIR} && export EDK_TOOLS_PATH=${EDK2_DIR}/BaseTools && export CLANG_BIN=${CLANG_BIN} && source ./edksetup.sh BaseTools && build -n 4"
   BUILD_BYPRODUCTS "${A9NLOADER_EXECUTABLE_DIR}/${A9NLOADER_EXECUTABLE}"
-  INSTALL_COMMAND ${CMAKE_COMMAND} -E copy "${A9NLOADER_EXECUTABLE_DIR}/${A9NLOADER_EXECUTABLE}" "${PROJECT_BINARY_DIR}/"
+  INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_if_different "${A9NLOADER_EXECUTABLE_DIR}/${A9NLOADER_EXECUTABLE}" "${PROJECT_BINARY_DIR}/"
   LOG_DOWNLOAD ON
   LOG_UPDATE ON
   LOG_CONFIGURE ON
   LOG_BUILD ON
 )
+
+# cp -r ${A9NLOADERPKG_DIR} a9nloaderPkg && cp -f ${TARGET_TXT} Conf/target.txt
