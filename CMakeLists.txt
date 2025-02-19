@@ -10,7 +10,6 @@ set(A9NLOADERPKG_DIR "${CMAKE_SOURCE_DIR}/a9nloaderPkg" CACHE PATH "Directory co
 set(TARGET_TXT "${CMAKE_SOURCE_DIR}/target.txt" CACHE FILEPATH "Path to target.txt")
 set(CLANG_BIN "/lib/llvm-19/bin/")
 
-set(EDK2_REPO "git@github.com:tianocore/edk2.git")
 set(EDK2_DIR "${CHAINDIR}/${ARCH}/edk2")
 set(EDK2_CONF_DIR "${EDK2_DIR}/Conf")
 set(BASETOOLS_DIR "${EDK2_DIR}/BaseTools")
@@ -27,7 +26,7 @@ ExternalProject_Add(edk2_project
   CONFIGURE_WORKING_DIRECTORY "${EDK2_DIR}"
   BUILD_WORKING_DIRECTORY "${EDK2_DIR}"
   CONFIGURE_COMMAND ""
-  BUILD_COMMAND bash -c "set -ex && cd ${EDK2_DIR} && git submodule update --init && export EDK_TOOLS_PATH=$(pwd)/BaseTools && export CLANG_BIN=/lib/llvm-19/bin/ && source ./edksetup.sh BaseTools && cp -r ${A9NLOADERPKG_DIR} a9nloaderPkg && cp -f ${TARGET_TXT} Conf/target.txt && build -n 4"
+  BUILD_COMMAND bash -c "set -ex && cd ${EDK2_DIR} && git submodule update --init && export EDK_TOOLS_PATH=${EDK2_DIR}/BaseTools && export CLANG_BIN=${CLANG_BIN} && source ./edksetup.sh BaseTools && cp -r ${A9NLOADERPKG_DIR} a9nloaderPkg && cp -f ${TARGET_TXT} Conf/target.txt && build -n 4"
   INSTALL_COMMAND ""
   LOG_DOWNLOAD ON
   LOG_UPDATE ON
