@@ -6,15 +6,15 @@ It is implemented using [*EDK2*](https://github.com/tianocore/edk2).
 ## Dependencies
 
 - cmake
-- clang-19
-- lld-19
-- llvm-19
+- clang
+- lld
+- llvm
 - build-essential
 - uuid-dev
 - iasl
 - git
 - nasm 
-- python-is-python3
+- python3
 
 ## Build
 
