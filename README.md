@@ -1,12 +1,20 @@
 # A9NLoader
 
-A9NLoader is the bootloader designed to launch the A9N Kernel.
+A9NLoader is a bootloader designed to launch the [*A9N Microkernel*](https://github.com/horizon2038/A9N) in accordance with the `A9N Boot Protocol (x86_64)`. It properly loads the Kernel Executable and Init Executable, making the system operational.  
+It is implemented using [*EDK2*](https://github.com/tianocore/edk2).
 
-## Usage
+## Dependencies
 
-The A9NLoader obtains the memory map and places the `kernel.elf` appropriately in memory.
-While it's primarily intended for booting the A9N Kernel, it's capable of launching other kernels in ELF format as well.
-In such cases, ensure your kernel is designed to receive the address of the `boot_info` structure.
+- cmake
+- clang-19
+- lld-19
+- llvm-19
+- build-essential
+- uuid-dev
+- iasl
+- git
+- nasm 
+- python-is-python3
 
 ## Build
 
@@ -14,6 +22,12 @@ In such cases, ensure your kernel is designed to receive the address of the `boo
 mkdir build
 cmake -B build
 cmake --build build
+```
+
+## Build with Docker (Recommended)
+
+```bash
+TODO
 ```
 
 ## License
