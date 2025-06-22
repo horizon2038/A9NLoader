@@ -40,10 +40,10 @@ ExternalProject_Add(edk2_project
   BUILD_COMMAND bash -c "set -ex && cd ${EDK2_DIR} && export EDK_TOOLS_PATH=${EDK2_DIR}/BaseTools && export CLANG_BIN=${CLANG_BIN} && source ./edksetup.sh BaseTools && build -n 4"
   BUILD_BYPRODUCTS "${A9NLOADER_EXECUTABLE_DIR}/${A9NLOADER_EXECUTABLE}"
   INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_if_different "${A9NLOADER_EXECUTABLE_DIR}/${A9NLOADER_EXECUTABLE}" "${PROJECT_BINARY_DIR}/"
-  LOG_DOWNLOAD ON
-  LOG_UPDATE ON
-  LOG_CONFIGURE ON
-  LOG_BUILD ON
+  # LOG_DOWNLOAD ON
+  # LOG_UPDATE ON
+  # LOG_CONFIGURE ON
+  # LOG_BUILD ON
 )
 
 # cp -r ${A9NLOADERPKG_DIR} a9nloaderPkg && cp -f ${TARGET_TXT} Conf/target.txt
