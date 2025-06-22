@@ -46,4 +46,9 @@ ExternalProject_Add(edk2_project
   # LOG_BUILD ON
 )
 
-# cp -r ${A9NLOADERPKG_DIR} a9nloaderPkg && cp -f ${TARGET_TXT} Conf/target.txt
+add_custom_target(
+    edk2_build
+    DEPENDS edk2_project
+)
+
+install(FILES "${PROJECT_BINARY_DIR}/${A9NLOADER_EXECUTABLE}" DESTINATION .)
