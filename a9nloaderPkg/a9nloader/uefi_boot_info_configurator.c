@@ -45,6 +45,12 @@ EFI_STATUS make_boot_info(
         EFI_MEMORY_DESCRIPTOR *uefi_desc
             = (EFI_MEMORY_DESCRIPTOR *)((char *)target_uefi_memory_map->buffer
                                         + i * target_uefi_memory_map->descriptor_size);
+        Print(
+            L"[UEFI] Type=%02x Start=%016llx Pages=%016llx\r\n",
+            uefi_desc->Type,
+            uefi_desc->PhysicalStart,
+            uefi_desc->NumberOfPages
+        );
 
         memory_map_entry new_entry;
         new_entry.physical_address_start = uefi_desc->PhysicalStart;
@@ -97,13 +103,6 @@ EFI_STATUS make_boot_info(
         }
 
         target_boot_info->boot_memory_info.memory_size += (new_entry.page_count * EFI_PAGE_SIZE);
-        Print(
-            L"[%2d] [%016llx - %016llx) %8s\r\n",
-            i,
-            new_entry.physical_address_start,
-            new_entry.physical_address_start + (new_entry.page_count * EFI_PAGE_SIZE),
-            (new_entry.type == FREE_MEMORY ? "FREE" : "DEVICE")
-        );
     }
 
     return EFI_SUCCESS;
