@@ -96,7 +96,7 @@ static EFI_STATUS mark_reserved_ap_trampoline_section(void)
     // user by kernel
     EFI_PHYSICAL_ADDRESS mp_trampoline_base = 0x6000;
     Print(L"try reserve mp_trampolibe_base : 0x%llx\r\n", mp_trampoline_base);
-    return gBS->AllocatePages(AllocateAddress, EfiReservedMemoryType, 1, &mp_trampoline_base);
+    return gBS->AllocatePages(AllocateAddress, EfiUnusableMemory, 1, &mp_trampoline_base);
 }
 
 EFI_STATUS load_kernel(EFI_FILE_PROTOCOL *kernel, uint64_t *entry_point)

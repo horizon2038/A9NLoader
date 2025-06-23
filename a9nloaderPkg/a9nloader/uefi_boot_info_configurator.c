@@ -40,7 +40,6 @@ EFI_STATUS make_boot_info(
 
     for (UINTN i = 0; i < entries_count; i++)
     {
-        Print(L"entries count [%04llx] \r\n", i);
         // memory_map_entry *target_memory_map_entry =
         // &target_boot_info->boot_memory_info.memory_map[i];
         EFI_MEMORY_DESCRIPTOR *uefi_desc
@@ -65,13 +64,13 @@ EFI_STATUS make_boot_info(
             case EfiMemoryMappedIOPortSpace :
             case EfiACPIReclaimMemory :
             case EfiACPIMemoryNVS :
+            case EfiReservedMemoryType :
                 new_entry.type = DEVICE_MEMORY;
                 break;
 
             // reserved
             case EfiRuntimeServicesCode :
             case EfiRuntimeServicesData :
-            case EfiReservedMemoryType :
             default :
                 new_entry.type = RESERVED_MEMORY;
         }
@@ -95,6 +94,13 @@ EFI_STATUS make_boot_info(
         }
 
         target_boot_info->boot_memory_info.memory_size += (new_entry.page_count * EFI_PAGE_SIZE);
+        Print(
+            L"[%2d] [%016llx - %016llx) %8s\r\n",
+            i,
+            new_entry.physical_address_start,
+            new_entry.physical_address_start + (new_entry.page_count * EFI_PAGE_SIZE),
+            (new_entry.type == FREE_MEMORY ? "FREE" : "DEVICE")
+        );
     }
 
     return EFI_SUCCESS;
