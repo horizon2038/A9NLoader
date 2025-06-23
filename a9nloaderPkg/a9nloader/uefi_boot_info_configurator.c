@@ -58,6 +58,7 @@ EFI_STATUS make_boot_info(
             case EfiBootServicesCode :
             case EfiBootServicesData :
             case EfiConventionalMemory :
+            case EfiACPIReclaimMemory :
             case EfiPersistentMemory :
                 new_entry.type = FREE_MEMORY;
                 break;
@@ -65,7 +66,6 @@ EFI_STATUS make_boot_info(
             // device
             case EfiMemoryMappedIO :
             case EfiMemoryMappedIOPortSpace :
-            case EfiACPIReclaimMemory :
                 new_entry.type = DEVICE_MEMORY;
                 break;
 
