@@ -53,9 +53,12 @@ EFI_STATUS make_boot_info(
         switch (uefi_desc->Type)
         {
             // free
-            case EfiConventionalMemory :
+            case EfiLoaderCode :
+            case EfiLoaderData :
             case EfiBootServicesCode :
             case EfiBootServicesData :
+            case EfiConventionalMemory :
+            case EfiPersistentMemory :
                 new_entry.type = FREE_MEMORY;
                 break;
 
@@ -63,14 +66,14 @@ EFI_STATUS make_boot_info(
             case EfiMemoryMappedIO :
             case EfiMemoryMappedIOPortSpace :
             case EfiACPIReclaimMemory :
-            case EfiACPIMemoryNVS :
-            case EfiReservedMemoryType :
                 new_entry.type = DEVICE_MEMORY;
                 break;
 
             // reserved
             case EfiRuntimeServicesCode :
             case EfiRuntimeServicesData :
+            case EfiACPIMemoryNVS :
+            case EfiReservedMemoryType :
             default :
                 new_entry.type = RESERVED_MEMORY;
         }
