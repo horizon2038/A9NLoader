@@ -279,24 +279,64 @@ static EFI_STATUS read_elf_program_header_table(
 static EFI_STATUS
     allocate_elf_memory_direct(elf64_header *header, elf64_program_header *program_header_table)
 {
+    /*
     EFI_STATUS efi_status            = EFI_SUCCESS;
     uint64_t   start_segment_address = 0;
     uint64_t   end_segment_address   = 0;
     uint64_t   segment_size          = 0;
 
-    calculate_elf_segment_range(header, program_header_table, &start_segment_address, &end_segment_address);
-    segment_size = EFI_SIZE_TO_PAGES(end_segment_address - start_segment_address);
-    Print(
-        L"target segment : [0x%016llx - 0x%016llx) (0x%08llx * 4KiB)\r\n",
-        start_segment_address,
-        end_segment_address,
-        segment_size
+    calculate_elf_segment_range(header, program_header_table, &start_segment_address,
+    &end_segment_address); segment_size = EFI_SIZE_TO_PAGES(end_segment_address -
+    start_segment_address); Print( L"target segment : [0x%016llx - 0x%016llx) (0x%08llx *
+    4KiB)\r\n", start_segment_address, end_segment_address, segment_size
     );
     // EfiLoaderData => EfiReservedMemory
     efi_status
-        = gBS->AllocatePages(AllocateAddress, EfiReservedMemoryType, segment_size, &start_segment_address);
+        = gBS->AllocatePages(AllocateAddress, EfiReservedMemoryType, segment_size,
+    &start_segment_address);
 
     return efi_status;
+    */
+
+    EFI_STATUS            efi_status = EFI_SUCCESS;
+    elf64_program_header *program_header;
+
+    for (uint16_t i = 0; i < header->program_header_number; ++i)
+    {
+        program_header = &(program_header_table[i]);
+        if (program_header->type != PT_LOAD)
+        {
+            continue;
+        }
+
+        EFI_PHYSICAL_ADDRESS physical_address
+            = program_header->physical_address & ~0xFFFF800000000000ULL;
+        uintmax_t page_count = EFI_SIZE_TO_PAGES(program_header->memory_size);
+
+        if (page_count == 0)
+        {
+            Print(L"[ ERROR ] segment size is zero, skipping allocation.\r\n");
+            continue;
+        }
+
+        Print(
+            L"allocating segment #%u: [0x%016llx - 0x%016llx) (0x%08llx * 4KiB)\r\n",
+            i,
+            physical_address,
+            physical_address + ((1 << 12) * page_count),
+            page_count
+        );
+
+        efi_status
+            = gBS->AllocatePages(AllocateAddress, EfiReservedMemoryType, page_count, &physical_address);
+        if (EFI_ERROR(efi_status))
+        {
+            Print(L"[ ERROR ] failed to allocate memory for ELF segment #%u, status: %r\r\n", i, efi_status);
+            return efi_status;
+        }
+    }
+
+    return EFI_SUCCESS;
 }
 
 static EFI_STATUS allocate_elf_memory_any_address(
@@ -392,20 +432,31 @@ static void locate_elf_segment(
     uint64_t              physical_address_offset
 )
 {
-    CopyMem(
-        (void *)(program_header->physical_address + physical_address_offset),
-        source_buffer,
-        program_header->file_size
-    );
+    uintmax_t physical_address = program_header->physical_address + physical_address_offset;
+    if (program_header->file_size == 0)
+    {
+        // bss
+        physical_address &= ~0xFFFF800000000000ULL;
+    }
+
+    Print(L"physical address : 0x%016llx\r\n", physical_address);
+
+    CopyMem((void *)(physical_address), source_buffer, program_header->file_size);
 }
 
 static void zero_clear(elf64_program_header *program_header, uint64_t physical_address_offset)
 {
+    uintmax_t physical_address = program_header->physical_address + physical_address_offset;
+    if (program_header->file_size == 0)
+    {
+        // bss
+        physical_address &= ~0xFFFF800000000000ULL;
+    }
+
     if (program_header->file_size < program_header->memory_size)
     {
         gBS->SetMem(
-            (void *)(program_header->physical_address + physical_address_offset
-                     + program_header->file_size),
+            (void *)(physical_address + program_header->file_size),
             program_header->memory_size - program_header->file_size,
             0
         );
